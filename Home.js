@@ -1,23 +1,34 @@
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View,Image,FlatList } from "react-native";
 import Firebase from "react-native-firebase";
 
 export default class Home extends React.Component {
-    state = {
-        data: [],
-    }
+  state = {
+    data: []
+  };
   componentDidMount() {
     Firebase.database()
       .ref("images")
       .on("value", d => {
-        console.log(d.toJSON());
+        console.log();
+        this.setState({
+          data: Object.values(d.toJSON()).map(({ downloadURL }) => downloadURL)
+        });
       });
   }
 
-  render() {
+    render() {
+      console.log(this.state.data)
     return (
       <View style={{ flex: 1 }}>
         <Text>Home</Text>
+        <FlatList
+          data={this.state.data}
+          renderItem={({ item }) => (
+              <Image source={{ uri: item }} style={{ width:'100%',height:200 }} />
+          )}
+          keyExtractor={item => item}
+        />
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate("NewPost")}
           style={{
